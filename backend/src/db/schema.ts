@@ -52,3 +52,15 @@ export const verification = pgTable('verification', {
 }, (table)=>[
   index('token_idx').on(table.token)
 ])
+
+
+
+export const sessions = pgTable('sessions', {
+  id: uuid('id').defaultRandom().notNull(),
+  userId: uuid('user_id').notNull().references(()=> user.id, {onDelete: 'cascade'}),
+  tokenHash: text('token_hash').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
