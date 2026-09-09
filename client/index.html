@@ -1,13 +1,429 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<!DOCTYPE html>
+
+<html class="dark h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MyAuthify — The Modern Authentication Infrastructure for Developers</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-highest": "#18181b",
+            "surface-container": "#121215",
+            "surface-container-low": "#0d0d10",
+            "surface-container-lowest": "#09090b",
+            "background": "#09090b",
+            "primary": "#818cf8",
+            "primary-container": "#4f46e5",
+            "secondary": "#a78bfa",
+            "secondary-container": "#6366f1",
+            "tertiary": "#38bdf8",
+            "outline": "#71717a",
+            "outline-variant": "#27272a",
+            "on-surface": "#f4f4f5",
+            "on-surface-variant": "#a1a1aa"
+          },
+          borderRadius: {
+            "DEFAULT": "0.375rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            headline: ["Public Sans", "sans-serif"],
+            display: ["Public Sans", "sans-serif"],
+            body: ["Public Sans", "sans-serif"],
+            label: ["Public Sans", "sans-serif"],
+            mono: ["Fira Code", "monospace"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .grid-bg {
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    @keyframes floatGlow1 {
+      0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.18; }
+      50% { transform: translate(-48%, 15px) scale(1.06); opacity: 0.25; }
+    }
+    .glow-orb-1 { animation: floatGlow1 12s ease-in-out infinite; }
+
+    .glass-card {
+      background: rgba(24, 24, 27, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(39, 39, 42, 0.75);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    .shimmer-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .shimmer-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.22) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      transition: all 0.6s ease;
+    }
+    .shimmer-btn:hover::after {
+      left: 130%;
+    }
+
+    @keyframes spinFaster {
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-fast {
+      animation: spinFaster 0.6s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .glow-orb-1, .shimmer-btn::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+</style>
+</head>
+<body class="bg-[#09090b] text-zinc-100 font-body selection:bg-indigo-600 selection:text-white antialiased h-screen min-h-screen max-h-screen overflow-hidden flex flex-col justify-between relative">
+<!-- Ambient Background Glows & Matrix Grid -->
+<div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+<div class="glow-orb-1 absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-to-tr from-indigo-600/20 via-purple-600/15 to-cyan-500/15 blur-[130px] rounded-full"></div>
+<div class="absolute top-[40%] -left-[10%] w-[450px] h-[450px] bg-cyan-500/10 blur-[140px] rounded-full"></div>
+<div class="absolute top-[40%] -right-[10%] w-[500px] h-[500px] bg-indigo-500/12 blur-[150px] rounded-full"></div>
+<div class="absolute inset-0 grid-bg opacity-80"></div>
+</div>
+<!-- 1. Top Navbar (Compact Height) -->
+<header class="relative z-30 w-full border-b border-zinc-800/80 bg-[#09090b]/80 backdrop-blur-md flex-shrink-0">
+<div class="max-w-7xl mx-auto h-14 sm:h-16 px-6 lg:px-12 flex items-center justify-between">
+<!-- Logo -->
+<a class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-white flex items-center gap-2.5 group" href="#">
+<div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-cyan-400 p-[1px] flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
+<div class="w-full h-full bg-[#09090b] rounded-[7px] flex items-center justify-center">
+<span class="material-symbols-outlined text-indigo-400 text-lg sm:text-xl group-hover:text-cyan-300 transition-colors" style='font-variation-settings: "FILL" 1;'>security</span>
+</div>
+</div>
+<span class="bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent">MyAuthify</span>
+</a>
+<!-- Nav Links -->
+<nav class="hidden md:flex items-center gap-7 text-xs sm:text-sm font-label">
+<a class="text-zinc-300 hover:text-white transition-colors" href="#">Features</a>
+<a class="text-zinc-400 hover:text-white transition-colors" href="#">Showcase</a>
+<a class="text-zinc-400 hover:text-white transition-colors" href="#">Docs</a>
+<a class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-xs text-zinc-300 font-medium transition-all" href="https://github.com" target="_blank">
+<span class="material-symbols-outlined text-xs text-amber-400" style='font-variation-settings: "FILL" 1;'>star</span>
+<span>GitHub 4.2k</span>
+</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-3">
+<button class="shimmer-btn px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 hover:opacity-95 text-white font-headline font-semibold text-xs tracking-wide shadow-md shadow-indigo-500/25 transition-all duration-150 active:scale-[0.98] flex items-center gap-1.5">
+<span>Launch App</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</header>
+<!-- 2. Two-Column Single-Window Hero (Center Area, flex-1) -->
+<main class="relative z-10 flex-1 flex items-center max-w-7xl mx-auto px-6 lg:px-12 w-full py-3 overflow-hidden">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center w-full my-auto">
+<!-- Left Column: Copy, CTAs & Mini Checkpoints -->
+<div class="lg:col-span-6 flex flex-col justify-center text-left space-y-4 lg:space-y-5">
+<!-- Eyebrow Pill -->
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-medium border border-indigo-500/40 bg-indigo-500/10 text-indigo-300 shadow-sm shadow-indigo-500/20 backdrop-blur-md w-fit">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+</span>
+<span class="tracking-tight text-zinc-200">✦ v2.4 Released</span>
+<span class="text-zinc-600">·</span>
+<span class="text-indigo-300">The TypeScript-first Auth Engine</span>
+</div>
+<!-- Main Catchy Headline -->
+<h1 class="text-3xl sm:text-4xl lg:text-[44px] xl:text-[50px] font-headline font-extrabold tracking-tight text-white leading-[1.12]">
+        Stop Fighting Auth.<br/>
+<span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-400">Radically Simple Auth</span> for Devs.
+      </h1>
+<!-- Concise Subheadline -->
+<p class="text-sm sm:text-base text-zinc-300 max-w-xl font-body font-normal leading-relaxed">
+        Plug-and-play sessions, scoped API keys, and passkeys in 3 lines of code. Zero lock-in, 100% type-safe.
+      </p>
+<!-- CTAs & Copyable Terminal Pill -->
+<div class="flex flex-wrap items-center gap-3 pt-1">
+<a class="shimmer-btn px-5 py-2.5 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 hover:opacity-95 text-white font-headline font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-1.5" href="#">
+<span>Get Started Free</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+<a class="px-4 py-2.5 rounded-lg glass-card text-zinc-200 hover:text-white border border-zinc-700/80 hover:border-zinc-500 font-headline font-medium text-xs sm:text-sm transition-all flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-base text-indigo-400">menu_book</span>
+<span>Read Docs</span>
+</a>
+<!-- Terminal Command Pill -->
+<div class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs font-mono text-zinc-300 hover:border-indigo-500/40 transition-all shadow-sm group" id="hero-cmd-wrapper">
+<span class="text-indigo-400 font-semibold">$</span>
+<span class="select-all text-[11px] sm:text-xs">npm i @myauthify/core</span>
+<button class="material-symbols-outlined text-sm text-zinc-400 hover:text-indigo-300 ml-1 transition-colors active:scale-90" id="hero-copy-cmd" title="Copy command" type="button">content_copy</button>
+</div>
+</div>
+<!-- Micro Feature Checklist / Badges -->
+<div class="pt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-mono text-zinc-400">
+<div class="flex items-center gap-1.5 bg-zinc-900/50 px-2.5 py-1 rounded-md border border-zinc-800/60">
+<span>⚡</span>
+<span class="text-zinc-300">Sub-millisecond JWTs</span>
+</div>
+<div class="flex items-center gap-1.5 bg-zinc-900/50 px-2.5 py-1 rounded-md border border-zinc-800/60">
+<span>🔑</span>
+<span class="text-zinc-300">Built-in Passkeys & WebAuthn</span>
+</div>
+<div class="flex items-center gap-1.5 bg-zinc-900/50 px-2.5 py-1 rounded-md border border-zinc-800/60">
+<span>🛡️</span>
+<span class="text-zinc-300">Zero Vendor Lock-in</span>
+</div>
+</div>
+</div>
+<!-- Right Column: BetterAuth-style Code Sandbox & Interactive JWT Claim Widget -->
+<div class="lg:col-span-6 w-full">
+<div class="glass-card rounded-xl overflow-hidden border border-zinc-800/90 shadow-2xl shadow-indigo-500/10 relative">
+<!-- Terminal Window Header -->
+<div class="bg-zinc-900/95 px-4 py-2.5 border-b border-zinc-800/90 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-green-500/80"></span>
+</div>
+<span class="text-xs font-mono text-zinc-400 ml-2 hidden sm:inline" id="terminal-filename">auth.ts</span>
+</div>
+<!-- Clickable Language/Framework Tabs -->
+<div class="flex items-center gap-1 bg-zinc-950 p-0.5 rounded-md border border-zinc-800 text-xs font-label" id="framework-tabs">
+<button class="tab-btn px-2.5 py-0.5 rounded bg-indigo-600 text-white font-medium text-[11px] transition-all" data-tab="react">React / Next.js</button>
+<button class="tab-btn px-2.5 py-0.5 rounded text-zinc-400 hover:text-white text-[11px] transition-all" data-tab="express">Express</button>
+<button class="tab-btn px-2.5 py-0.5 rounded text-zinc-400 hover:text-white text-[11px] transition-all" data-tab="prisma">Prisma</button>
+</div>
+<!-- Latency Badge -->
+<div class="flex items-center gap-1.5 text-[10px] font-mono text-emerald-400">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="hidden sm:inline font-medium">Edge Latency: 4ms</span>
+</div>
+</div>
+<!-- Syntax-Highlighted Code Snippet -->
+<div class="p-4 bg-[#09090b] font-mono text-[11.5px] sm:text-xs leading-relaxed overflow-x-auto border-b border-zinc-800/80" id="code-snippet-box">
+<pre class="text-zinc-100"><code><span class="text-indigo-400 font-semibold">import</span> { createAuthClient, magicLink } <span class="text-indigo-400 font-semibold">from</span> <span class="text-emerald-300">"@myauthify/react"</span>;
+
+<span class="text-indigo-400 font-semibold">export const</span> auth = <span class="text-cyan-300">createAuthClient</span>({
+  baseURL: <span class="text-emerald-300">"https://api.myauthify.dev"</span>,
+  plugins: [<span class="text-cyan-300">magicLink</span>(), <span class="text-cyan-300">passkey</span>()]
+});
+
+<span class="text-zinc-500">// Type-safe active reactive session hook</span>
+<span class="text-indigo-400 font-semibold">const</span> { data: session } = auth.<span class="text-cyan-300">useSession</span>();</code></pre>
+</div>
+<!-- Live Interactive Mini Session Claim Tester -->
+<div class="p-3.5 bg-zinc-950/80 flex flex-col gap-2.5" id="claims-box-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-cyan-400 text-sm">token</span>
+<span class="text-[11px] font-mono text-zinc-300 font-medium">Session Payload Claims</span>
+</div>
+<button class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-label font-semibold transition-all flex items-center gap-1 shadow-sm active:scale-95" id="authenticate-btn">
+<span class="material-symbols-outlined text-xs" id="auth-btn-icon">lock_open</span>
+<span id="auth-btn-text">Test Sign In</span>
+</button>
+</div>
+<!-- Payload Display Box -->
+<div class="rounded-lg bg-[#09090b] border border-zinc-800/80 p-2.5 font-mono text-[11px] text-zinc-300 flex items-center justify-between">
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+<span><span class="text-zinc-500">sub:</span> <span class="text-emerald-300" id="claim-sub">"usr_8a92f1"</span></span>
+<span><span class="text-zinc-500">role:</span> <span class="text-cyan-300">"developer"</span></span>
+<span><span class="text-zinc-500">mfa:</span> <span class="text-amber-300">true</span></span>
+<span><span class="text-zinc-500">exp:</span> <span class="text-purple-300">"7d"</span></span>
+</div>
+<span class="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/60 text-[10px] text-emerald-400 font-mono font-medium flex items-center gap-1 shrink-0 ml-2" id="token-status-tag">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Verified
+            </span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- 3. Sleek Bottom Dock / Single-Line Footer -->
+<footer class="relative z-30 w-full border-t border-zinc-800/80 bg-[#09090b]/90 backdrop-blur-md flex-shrink-0">
+<div class="max-w-7xl mx-auto h-12 px-6 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs font-mono text-zinc-400">
+<!-- Edge Status -->
+<div class="flex items-center gap-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+</span>
+<span class="text-zinc-300 font-medium">All Systems Operational</span>
+<span class="text-zinc-600 hidden sm:inline">|</span>
+<span class="text-zinc-500 hidden sm:inline">SHA-256 Validated</span>
+</div>
+<!-- Compatibility Pills -->
+<div class="hidden md:flex items-center gap-1.5 text-[11px]">
+<span class="text-zinc-500 mr-1">Deploy with:</span>
+<span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">Next.js</span>
+<span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">React</span>
+<span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">Express</span>
+<span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">Prisma</span>
+<span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">Cloudflare</span>
+</div>
+<!-- Quick Links -->
+<div class="flex items-center gap-4 text-[11px] font-label">
+<a class="hover:text-white transition-colors" href="#">Security</a>
+<a class="hover:text-white transition-colors" href="#">API Reference</a>
+<a class="hover:text-white transition-colors" href="#">License (MIT)</a>
+</div>
+</div>
+</footer>
+<!-- Interactive Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Code snippets mapping for Better-Auth style tabs
+    const snippets = {
+      react: {
+        filename: 'auth.ts',
+        code: `<span class="text-indigo-400 font-semibold">import</span> { createAuthClient, magicLink } <span class="text-indigo-400 font-semibold">from</span> <span class="text-emerald-300">"@myauthify/react"</span>;
+
+<span class="text-indigo-400 font-semibold">export const</span> auth = <span class="text-cyan-300">createAuthClient</span>({
+  baseURL: <span class="text-emerald-300">"https://api.myauthify.dev"</span>,
+  plugins: [<span class="text-cyan-300">magicLink</span>(), <span class="text-cyan-300">passkey</span>()]
+});
+
+<span class="text-zinc-500">// Type-safe active reactive session hook</span>
+<span class="text-indigo-400 font-semibold">const</span> { data: session } = auth.<span class="text-cyan-300">useSession</span>();`
+      },
+      express: {
+        filename: 'server.ts',
+        code: `<span class="text-indigo-400 font-semibold">import</span> express <span class="text-indigo-400 font-semibold">from</span> <span class="text-emerald-300">"express"</span>;
+<span class="text-indigo-400 font-semibold">import</span> { requireSession, verifyApiKey } <span class="text-indigo-400 font-semibold">from</span> <span class="text-emerald-300">"@myauthify/express"</span>;
+
+<span class="text-indigo-400 font-semibold">const</span> app = <span class="text-cyan-300">express</span>();
+app.<span class="text-cyan-300">get</span>(<span class="text-emerald-300">"/api/vault"</span>, <span class="text-cyan-300">verifyApiKey</span>({ scopes: [<span class="text-emerald-300">"vault:read"</span>] }), (req, res) => {
+  res.<span class="text-cyan-300">json</span>({ authorized: <span class="text-purple-300">true</span>, userId: req.auth.userId });
+});`
+      },
+      prisma: {
+        filename: 'schema.prisma',
+        code: `<span class="text-zinc-500">// MyAuthify Prisma schema integration</span>
+<span class="text-indigo-400 font-semibold">model</span> <span class="text-cyan-300">Session</span> {
+  id        <span class="text-purple-300">String</span>   @id @default(cuid())
+  userId    <span class="text-purple-300">String</span>
+  token     <span class="text-purple-300">String</span>   @unique
+  expiresAt <span class="text-purple-300">DateTime</span>
+  user      <span class="text-cyan-300">User</span>     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}`
+      }
+    };
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const filenameElem = document.getElementById('terminal-filename');
+    const snippetCodeElem = document.querySelector('#code-snippet-box code');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white', 'font-medium');
+          b.classList.add('text-zinc-400');
+        });
+        btn.classList.add('bg-indigo-600', 'text-white', 'font-medium');
+        btn.classList.remove('text-zinc-400');
+
+        const tabKey = btn.getAttribute('data-tab');
+        if (snippets[tabKey]) {
+          filenameElem.textContent = snippets[tabKey].filename;
+          snippetCodeElem.innerHTML = snippets[tabKey].code;
+        }
+      });
+    });
+
+    // 2. Terminal copy command feedback
+    const heroCopyBtn = document.getElementById('hero-copy-cmd');
+    if (heroCopyBtn) {
+      heroCopyBtn.addEventListener('click', () => {
+        navigator.clipboard?.writeText('npm i @myauthify/core');
+        heroCopyBtn.textContent = 'check';
+        heroCopyBtn.classList.add('text-emerald-400');
+        setTimeout(() => {
+          heroCopyBtn.textContent = 'content_copy';
+          heroCopyBtn.classList.remove('text-emerald-400');
+        }, 1600);
+      });
+    }
+
+    // 3. Interactive live auth payload simulator
+    const authBtn = document.getElementById('authenticate-btn');
+    const authBtnText = document.getElementById('auth-btn-text');
+    const authBtnIcon = document.getElementById('auth-btn-icon');
+    const claimSub = document.getElementById('claim-sub');
+    const claimsContainer = document.getElementById('claims-box-container');
+
+    if (authBtn) {
+      authBtn.addEventListener('click', () => {
+        authBtn.disabled = true;
+        authBtnIcon.textContent = 'progress_activity';
+        authBtnIcon.classList.add('animate-spin-fast');
+        authBtnText.textContent = 'Verifying...';
+
+        setTimeout(() => {
+          const randomId = 'usr_' + Math.random().toString(36).substring(2, 8);
+          if (claimSub) claimSub.textContent = `"${randomId}"`;
+
+          if (claimsContainer) {
+            claimsContainer.classList.add('ring-1', 'ring-emerald-500/50');
+            setTimeout(() => {
+              claimsContainer.classList.remove('ring-1', 'ring-emerald-500/50');
+            }, 1000);
+          }
+
+          authBtnIcon.classList.remove('animate-spin-fast');
+          authBtnIcon.textContent = 'check';
+          authBtnText.textContent = 'Claimed!';
+
+          setTimeout(() => {
+            authBtn.disabled = false;
+            authBtnIcon.textContent = 'lock_open';
+            authBtnText.textContent = 'Test Sign In';
+          }, 1800);
+        }, 500);
+      });
+    }
+  });
+</script>
+</body></html>
