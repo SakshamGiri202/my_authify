@@ -5,15 +5,6 @@ dist/
 
 .env
 
-.agent
-.agents
-.claude
-.codex
-.gemini
-.hermes
-.impeccable
-.opencode
-.pi
-.vibe
+
 
 
